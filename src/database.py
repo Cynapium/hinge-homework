@@ -1,12 +1,19 @@
+import json
 import sqlite3
 from sqlite3 import Error
 
-databaseName = "hinge.db"
-#connection = None
+databaseName = None
+databaseSetup = None
 
-def initializeDatabase():
-    global connection
-    #connection = sqlite3.connect(databaseName)
+
+def initializeDatabase(name, setupFile):
+    global databaseSetup
+    global databaseName
+
+    databaseName = name
+    with open(setupFile, 'r') as f:
+        databaseSetup = json.load(f)
+
 
 def executeQuery(request):
     """ Execute SQL requests """
@@ -19,9 +26,7 @@ def executeQuery(request):
         with sqlite3.connect(databaseName) as connection:
             cursor = connection.cursor()
             cursor.execute(request)
-            data = cursor.fetchall()
-            if request.upper().startswith("SELECT"):
-                results = data
+            results = cursor.fetchall()
     except Error as error:
         print ("An error occured: ", error.args[0])
         print ("For the request: ", request)
@@ -33,15 +38,51 @@ def insertRecord(table, record):
     columns = []
     values  = []
     for key in record:
-        columns.append(key)
         value = record[key]
-        if isinstance(value, str):
-            values.append('"' + value + '"')
-        else:
-            values.append(value)
+        if value != None:
+            columns.append(key)
+            if isinstance(value, str):
+                values.append('"' + value + '"')
+            else:
+                values.append(str(value))
 
     separator = ", "
     sql = "INSERT INTO " + table + " (" + separator.join(columns) + ") VALUES ("+ separator.join(values)+ ");"
+    print (sql)
+
+    with sqlite3.connect(databaseName) as connection:
+        cursor = connection.cursor()
+        ret = cursor.execute(sql)
+        userId = cursor.lastrowid
+        connection.commit()
+        return userId
+
+    return 0
+
+
+def updateRecord(table, record, whereColumns):
+    global connection
+
+    # Build the "SET" with the list of columns to update
+    updateSet = []
+    updateWhere = []
+    for key in record:
+        # Format value
+        value = record[key]
+        if isinstance(value, str):
+            value = key + '="' + value + '"'
+        else:
+            value = key + "=" + str(value)
+        # Add to where clause or set list
+        if key in whereColumns:
+            updateWhere.append(value)
+        elif record[key] != None:
+            updateSet.append(value)
+
+    separator = ", "
+    sql =  "UPDATE " + table
+    sql += " SET " + ", ".join(updateSet)
+    sql += " WHERE " + ", ".join(updateWhere)
     print (sql)
 
     try:
@@ -50,11 +91,10 @@ def insertRecord(table, record):
             ret = cursor.execute(sql)
             userId = cursor.lastrowid
             connection.commit()
-            print(ret)
     except Error as error:
         print ("An error occured: ", error.args[0])
         print ("For the request: ", sql)
 
-    return userId
+    return 0
 
 
