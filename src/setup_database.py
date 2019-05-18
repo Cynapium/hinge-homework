@@ -34,8 +34,6 @@ def createTable(connection, tableName, tableInfo):
 
     try:
         cursor = connection.cursor()
-        #cursor.execute("drop table " + tableName)
-        #connection.commit()
         cursor.execute(sql)
         connection.commit()
     except Error as e:
