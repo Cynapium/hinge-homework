@@ -1,0 +1,27 @@
+{
+    "tables": {
+        "user": {
+            "columns": [
+                { "name": "id", "type": "integer" },
+                { "name": "first_name", "type": "integer", "mandatory": true },
+                { "name": "phone", "type": "text" },
+                { "name": "email", "type": "text" },
+                { "name": "birthdate", "type": "text", "mandatory": true },
+                { "name": "description", "type": "text" }
+            ],
+            "keys": [
+                { "type": "primary", "columns": "id" }
+            ]
+        },
+        "interaction": {
+            "columns": [
+                { "name": "user", "type": "integer" },
+                { "name": "user_target", "type": "integer" },
+                { "name": "type", "type": "text" }
+            ],
+            "keys": [
+                { "type": "primary", "columns": "user, user_target" }
+            ]
+        }
+    }
+}
