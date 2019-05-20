@@ -37,7 +37,7 @@ def updateUserProfile(userId, userProfile):
     ''' Update a user profile '''
     userProfile["id"] = userId
     database.updateRecord("user", userProfile, "id")
-    return userProfile
+    return getUserProfile(userId)
 
 
 def getListUsers():
@@ -54,7 +54,7 @@ def getListUsers():
     return userList
 
 
-def getListIncommingLikes(userId):
+def getListIncomingLikes(userId):
     ''' Return the list of incomming likes for a given user, minus people that
         the user has already rated '''
 

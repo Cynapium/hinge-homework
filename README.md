@@ -12,9 +12,10 @@ the database with tables and some data.
 
 ### Run the api
 
-python3.7 app.py
+python3.7 src/app.py
 
 That will start the api for testing.
+It will be running on http://127.0.0.1:5000/
 
 
 ## Database schema
@@ -51,9 +52,9 @@ The types of ratings are:
 - R:    Reports
 
 
-## Versionning
+## Versioning
 
-The versions available are v1 and v2. They prefix all endpoints in the api.
+The versions available are "v1" and "v2". They prefix all endpoints in the api.
 
 Differences between v1 and v2:
 - "name" was renamed "first_name" in user definition
@@ -69,7 +70,13 @@ Differences between v1 and v2:
 
 Return the list of all users in the database.
 
-#### V1 Response
+#### V1 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request POST \
+     http://localhost:5000/v1/users
+
+Response:
 {
   "users": [
     {
@@ -87,7 +94,13 @@ Return the list of all users in the database.
   ]
 }
 
-#### V2 Response
+#### V2 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request POST \
+     http://localhost:5000/v2/users
+
+Response:
 {
   "users": [
     {
@@ -124,34 +137,30 @@ returned (mandatory fields are name/first_name and birthdate).
 
 The response will be the description of the user plus the id.
 
-##### V1 Request/Response
+##### V1 Example
 Request:
-{
-  "name": "Georges",
-  "description": "Lorem Ipsum",
-  "birthdate": "01/01/1990"
-}
+curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"name": "Georges", "description": "", "birthdate": "01/01/1991"}'
+     http://localhost:5000/v1/users
+
 Response:
 {
   "users": {
     "id": 107,
     "name": "Georges",
-    "description": "Lorem Ipsum",
+    "description": "",
     "birthdate": "01/01/1990"
   }
 }
 
-##### V2 Response
+##### V2 Example
 Request:
-{
-  "users": {
-    "first_name": "Georges",
-    "last_name": "",
-    "birthdate": "10/10/1990",
-    "description": "",
-    "gender": "M",
-  }
-}
+curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"first_name": "Georges", "last_name": "", "description": "", "birthdate": "01/01/1991", "gender": "M"}'
+     http://localhost:5000/v2/users
+
 Response:
 {
   "user": {
@@ -172,7 +181,11 @@ Response:
 
 Return the list of a given user identified by their user_id.
 
-#### V1 Response
+#### V1 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v1/users/107
 {
   "users": {
     "id": 107,
@@ -182,7 +195,11 @@ Return the list of a given user identified by their user_id.
   }
 
 
-#### V2 Response
+#### V2 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v2/users/107
 {
   "user": {
     "id": 107,
@@ -200,19 +217,62 @@ Return the list of a given user identified by their user_id.
 Update the profile of a given user identified by their user_id. 
 
 This request works the same way as POST /<int:version>/users. The request and
-responses format are the same. 
+responses format are the same. The body only needs the fields that are
+modified, and the full user profile is returned.
 
+##### V1 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request PUT \
+     --data '{"description": "Hello!"}'
+     http://localhost:5000/v1/users/107
+
+Response:
+{
+  "users": {
+    "id": 107,
+    "name": "Georges",
+    "description": "Hello!",
+    "birthdate": "01/01/1990"
+  }
+}
+
+##### V2 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request PUT \
+     --data '{"description": "Hello!", "gender_target": "M"}'
+     http://localhost:5000/v2/users/107
+
+Response:
+{
+  "user": {
+    "id": 107,
+    "first_name": "Georges",
+    "last_name": "",
+    "birthdate": "10/10/1990",
+    "description": "Hello!",
+    "gender": "M",
+    "gender_target": "M"
+  }
+}
 
 
 ### /<string:version>/users/<int:user_id>/likes
 #### GET
 
-List all incomming likes for a given user. Incomming likes are any users that
+List all incoming likes for a given user. Incoming likes are any users that
 liked the user identified by <user_id>, but that <user_id> did not yet rate.
 
 No JSON body has to be sent. 
 
 ##### V1 Reponse
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v1/users/107/likes
+
+Response:
 {
   "likes": [
     [
@@ -228,6 +288,12 @@ No JSON body has to be sent.
 }
 
 ##### V2 Response
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v2/users/107/likes
+
+Response:
 {
   "likes": [
     "/v2/users/103",
@@ -248,6 +314,34 @@ No JSON body has to be sent.
 
 The responses have the same format as for the likes.
 
+##### V1 Reponse
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v1/users/107/matches
+
+Response:
+{
+  "likes": [
+    [
+      102
+    ]
+  ]
+}
+
+##### V2 Response
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v2/users/107/matches
+
+Response:
+{
+  "likes": [
+    "/v2/users/102"
+  ]
+}
+
 
 
 ### /<string:version>/users/<int:user_id>/recommendations
@@ -258,22 +352,66 @@ not yet rate the given user (either by liking, blocking or reporting them) and
 that the given user has not rated yet either. 
 
 In v1, no JSON body has to be sent. 
-In v2, we can send filters for the gender and gender_target to filter the
-search. If no JSON body is sent, the response will include everyone regardless
-of gender or gender preferences. 
+In v2, we can send filters for the gender to filter the search. 
 
-The responses have the same format as for the likes.
+The responses have the same format as for the likes and matches.
 
-##### V2 Request
-Two filters are available:
-- gender specify which gender we want the matches to be. It can be "F" for
-  women, "M" for men, or null if we want both. 
-- gender_target specify what the recommended user is looking for. The values
-  are the same than for gender.
+##### V1 Reponse
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     http://localhost:5000/v1/users/106/recommendations
+
+Response:
 {
-  "gender": "F",
-  "gender_target": "M"
+  "recommendations": [
+    [
+      101
+    ],
+    [
+      103
+    ],
+    [
+      104
+    ],
+    [
+      105
+    ]
+  ]
 }
+
+##### V2 Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     --data '{}'
+     http://localhost:5000/v1/users/106/recommendations
+
+Response:
+{
+  "recommendations": [
+    "/v2/users/101",
+    "/v2/users/103",
+    "/v2/users/104",
+    "/v2/users/105"
+  ]
+}
+
+##### V2 Example with filters
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     --data '{"gender": "F"}'
+     http://localhost:5000/v1/users/106/recommendations
+
+Response:
+{
+  "recommendations": [
+    "/v2/users/101",
+    "/v2/users/103"
+  ]
+}
+
 
 
 
@@ -290,15 +428,23 @@ The rating options are:
 - "blocks"
 - "reports"
 
-##### Response
+##### Example
+Request:
+curl --header "Content-Type: application/json" \
+     --request GET \
+     --data '{"gender": "F"}'
+     http://localhost:5000/v1/users/106/likes/101
+
+Response:
 {
   "rating": {
-    "user": 101,
-    "user_target": 102,
+    "user": 106,
+    "user_target": 101,
     "type": "L",
     "time": "2019-05-20 09:50:06.849060"
   }
 }
+
 
 
 ## Error management

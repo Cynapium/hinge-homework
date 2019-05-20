@@ -45,7 +45,7 @@ def updateUserProfile(userId, userProfile):
 
     userProfile["id"] = userId
     database.updateRecord("user", user, "id")
-    return userProfile
+    return getUserProfile(userId)
 
 
 def getListUsers():
@@ -70,7 +70,7 @@ def getListUsers():
     return userList
 
 
-def getListIncommingLikes(user_id):
+def getListIncomingLikes(user_id):
     ''' Return the list of incomming likes for a given user, minus people that
         the user has already rated '''
 
@@ -84,7 +84,6 @@ def getListIncommingLikes(user_id):
              AND r.type="L"
              AND r.user_target=""" + str(user_id))
 
-    print(users)
     return users
 
 
@@ -101,11 +100,7 @@ def getListMatches(userId):
              AND r2.type="L"
              AND r.user=""" + str(userId))
 
-    likes = []
-    for user in userIds:
-        likes.append("/v2/users/" + str(user[0]))
-
-    return likes
+    return userIds
 
 
 def getListRecommendations(userId):
@@ -126,11 +121,7 @@ def getListRecommendations(userId):
                 WHERE user={0}
             )""".format(userId))
 
-    recommendations = []
-    for user in userIds:
-        recommendations.append("/v2/users/" + str(user[0]))
-
-    return recommendations
+    return userIds
 
 
 def setRating(ratingDetails):

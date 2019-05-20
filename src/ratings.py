@@ -19,15 +19,15 @@ def getRatingCode(rating):
 class Likes(Resource):
 
     def get(self, version, user_id):
-        ''' Get list of all incomming likes for that given user '''
+        ''' Get list of all incoming likes for that given user '''
 
         result = { "likes": [] }
 
         try:
             if (version == "v1"):
-                result["likes"] = model_v1.getListIncommingLikes(user_id)
+                result["likes"] = model_v1.getListIncomingLikes(user_id)
             elif (version == "v2"):
-                result["likes"] = model_v2.getListIncommingLikes(user_id)
+                result["likes"] = model_v2.getListIncomingLikes(user_id)
             else:
                 raise Exception("Unrecognized version " + version)
 

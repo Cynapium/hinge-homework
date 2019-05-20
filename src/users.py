@@ -110,6 +110,10 @@ class Users(Resource):
                 parser.add_argument("description")
                 userInfo = parser.parse_args()
 
+                print("========")
+                print(userInfo)
+                print("========")
+
                 result["user"] = model_v1.createUserProfile(userInfo)
 
             # If V2, automatically parse the input from database columns
@@ -119,6 +123,9 @@ class Users(Resource):
                 for column in userColumns:
                     parser.add_argument(column["name"])
                 userInfo = parser.parse_args()
+                print("========")
+                print(userInfo)
+                print("========")
 
                 result["user"] = model_v2.createUserProfile(userInfo)
 
@@ -128,7 +135,7 @@ class Users(Resource):
 
         except Exception as e:
             response = ErrorResponse(Status.SERVER_ERROR,                    \
-                                     "Could not retrieve list of all users", \
+                                     "Could not insert new user",            \
                                      details=str(e))
             return response.dump()
 
