@@ -1,4 +1,4 @@
-import database
+from db import database
 
 def getUserProfile(userId):
     ''' Return information about a given user '''
@@ -23,29 +23,30 @@ def getUserProfile(userId):
 
 def createUserProfile(userProfile):
     ''' Create a new user '''
-    userProfile = {
+    user = {
         "first_name": userProfile["name"],
         "birthdate": userProfile["birthdate"],
-        "phone": userProfile["phone"],
-        "email": userProfile["email"]
+        "description": userProfile["description"],
     }
-    userId = database.insertRecord("user", userProfile)
+    userId = database.insertRecord("user", user)
     userProfile["id"] = userId
     return userProfile
+
 
 def updateUserProfile(userId, userProfile):
     ''' Update a user profile '''
 
-    userProfile = {
+    user = {
+        "id": userId,
         "first_name": userProfile["name"],
         "birthdate": userProfile["birthdate"],
-        "phone": userProfile["phone"],
-        "email": userProfile["email"]
+        "description": userProfile["description"],
     }
 
     userProfile["id"] = userId
-    database.updateRecord("user", userProfile, "id")
+    database.updateRecord("user", user, "id")
     return userProfile
+
 
 def getListUsers():
     ''' Get list of all users '''
@@ -55,6 +56,8 @@ def getListUsers():
     queryResults = database.executeQuery("""SELECT id, first_name, description, birthdate
                                             FROM user""")
     user_columns = database.databaseSetup["tables"]["user"]["columns"]
+
+    print(queryResults)
 
     for user in queryResults:
         userList.append({
@@ -66,26 +69,72 @@ def getListUsers():
 
     return userList
 
+
 def getListIncommingLikes(user_id):
     ''' Return the list of incomming likes for a given user, minus people that
         the user has already rated '''
 
     users = database.executeQuery(
-        """ SELECT i.user
-            FROM interaction i
-            LEFT JOIN interaction i2
-             ON i.user=i2.user_target
-             AND i.user_target=i2.user
-            WHERE i2.user_target IS NULL
-             AND i.user_target=""" + str(user_id))
+        """ SELECT r.user
+            FROM rating r
+            LEFT JOIN rating r2
+             ON r.user=r2.user_target
+             AND r.user_target=r2.user
+            WHERE r2.type IS NULL
+             AND r.type="L"
+             AND r.user_target=""" + str(user_id))
 
     print(users)
     return users
 
-def getListMatches(user_id):
-    ''' Return the list of Matches for a given user_id'''
 
-def getListDiscovery(user_id):
-    ''' Return the list of people whith whom the user hasn't interacted yet,
-        and whose people haven't interacted with the user either. '''
+def getListMatches(userId):
+    ''' Return the list of matches for a given user '''
 
+    userIds = database.executeQuery(
+        """ SELECT r.user
+            FROM rating r
+            LEFT JOIN rating r2
+             ON r.user=r2.user_target
+             AND r.user_target=r2.user
+            WHERE r.type="L"
+             AND r2.type="L"
+             AND r.user=""" + str(userId))
+
+    likes = []
+    for user in userIds:
+        likes.append("/v2/users/" + str(user[0]))
+
+    return likes
+
+
+def getListRecommendations(userId):
+    ''' Return the list of recommendations for a given user '''
+
+    userIds = database.executeQuery(
+        """ SELECT id
+            FROM user
+            WHERE id!={0}
+            AND id NOT IN (
+                SELECT user
+                FROM rating
+                WHERE user_target={0}
+            )
+            AND id NOT IN (
+                SELECT user_target
+                FROM rating
+                WHERE user={0}
+            )""".format(userId))
+
+    recommendations = []
+    for user in userIds:
+        recommendations.append("/v2/users/" + str(user[0]))
+
+    return recommendations
+
+
+def setRating(ratingDetails):
+    ''' '''
+    
+    database.insertRecord("rating", ratingDetails)
+    return ratingDetails

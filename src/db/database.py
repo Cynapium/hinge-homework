@@ -1,6 +1,5 @@
 import json
 import sqlite3
-from sqlite3 import Error
 
 databaseName = None
 databaseSetup = None
@@ -22,14 +21,10 @@ def executeQuery(request):
 
     print ("Received request: ", request)
 
-    try:
-        with sqlite3.connect(databaseName) as connection:
-            cursor = connection.cursor()
-            cursor.execute(request)
-            results = cursor.fetchall()
-    except Error as error:
-        print ("An error occured: ", error.args[0])
-        print ("For the request: ", request)
+    with sqlite3.connect(databaseName) as connection:
+        cursor = connection.cursor()
+        cursor.execute(request)
+        results = cursor.fetchall()
 
     return results
 
@@ -85,16 +80,10 @@ def updateRecord(table, record, whereColumns):
     sql += " WHERE " + ", ".join(updateWhere)
     print (sql)
 
-    try:
-        with sqlite3.connect(databaseName) as connection:
-            cursor = connection.cursor()
-            ret = cursor.execute(sql)
-            userId = cursor.lastrowid
-            connection.commit()
-    except Error as error:
-        print ("An error occured: ", error.args[0])
-        print ("For the request: ", sql)
+    with sqlite3.connect(databaseName) as connection:
+        cursor = connection.cursor()
+        ret = cursor.execute(sql)
+        userId = cursor.lastrowid
+        connection.commit()
 
-    return 0
-
-
+    return record

@@ -5,8 +5,6 @@
                 { "name": "id", "type": "integer" },
                 { "name": "first_name", "type": "integer", "mandatory": true },
                 { "name": "last_name", "type": "integer" },
-                { "name": "phone", "type": "text" },
-                { "name": "email", "type": "text" },
                 { "name": "birthdate", "type": "text", "mandatory": true },
                 { "name": "description", "type": "text" },
                 { "name": "gender", "type": "text" },
@@ -16,7 +14,7 @@
                 { "type": "primary", "columns": "id" }
             ]
         },
-        "interaction": {
+        "rating": {
             "columns": [
                 { "name": "user", "type": "integer" },
                 { "name": "user_target", "type": "integer" },
@@ -24,7 +22,9 @@
                 { "name": "time", "type": "text" }
             ],
             "keys": [
-                { "type": "primary", "columns": "user, user_target" }
+                { "type": "primary", "columns": "user, user_target" },
+                { "type": "foreign", "column": "user", "references": "user(id)" },
+                { "type": "foreign", "column": "user_target", "references": "user(id)" }
             ]
         }
     }
