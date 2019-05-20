@@ -73,7 +73,7 @@ Return the list of all users in the database.
 #### V1 Example
 Request:
 curl --header "Content-Type: application/json" \
-     --request POST \
+     --request GET \
      http://localhost:5000/v1/users
 
 Response:
@@ -97,7 +97,7 @@ Response:
 #### V2 Example
 Request:
 curl --header "Content-Type: application/json" \
-     --request POST \
+     --request GET \
      http://localhost:5000/v2/users
 
 Response:
@@ -158,7 +158,7 @@ Response:
 Request:
 curl --header "Content-Type: application/json" \
      --request POST \
-     --data '{"first_name": "Georges", "last_name": "", "description": "", "birthdate": "01/01/1991", "gender": "M"}'
+     --data '{"first_name": "Georges", "description": "", "birthdate": "01/01/1991", "gender": "M"}'
      http://localhost:5000/v2/users
 
 Response:
@@ -166,7 +166,7 @@ Response:
   "user": {
     "id": 107,
     "first_name": "Georges",
-    "last_name": "",
+    "last_name": null,
     "birthdate": "10/10/1990",
     "description": "",
     "gender": "M",
@@ -181,11 +181,13 @@ Response:
 
 Return the list of a given user identified by their user_id.
 
-#### V1 Example
+##### V1 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
      http://localhost:5000/v1/users/107
+
+Response:
 {
   "users": {
     "id": 107,
@@ -195,11 +197,13 @@ curl --header "Content-Type: application/json" \
   }
 
 
-#### V2 Example
+##### V2 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
      http://localhost:5000/v2/users/107
+
+Response:
 {
   "user": {
     "id": 107,
@@ -249,7 +253,7 @@ Response:
   "user": {
     "id": 107,
     "first_name": "Georges",
-    "last_name": "",
+    "last_name": null,
     "birthdate": "10/10/1990",
     "description": "Hello!",
     "gender": "M",
@@ -266,11 +270,11 @@ liked the user identified by <user_id>, but that <user_id> did not yet rate.
 
 No JSON body has to be sent. 
 
-##### V1 Reponse
+##### V1 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
-     http://localhost:5000/v1/users/107/likes
+     http://localhost:5000/v1/users/101/likes
 
 Response:
 {
@@ -287,11 +291,11 @@ Response:
   ]
 }
 
-##### V2 Response
+##### V2 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
-     http://localhost:5000/v2/users/107/likes
+     http://localhost:5000/v2/users/101/likes
 
 Response:
 {
@@ -314,11 +318,11 @@ No JSON body has to be sent.
 
 The responses have the same format as for the likes.
 
-##### V1 Reponse
+##### V1 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
-     http://localhost:5000/v1/users/107/matches
+     http://localhost:5000/v1/users/101/matches
 
 Response:
 {
@@ -329,11 +333,11 @@ Response:
   ]
 }
 
-##### V2 Response
+##### V2 Example
 Request:
 curl --header "Content-Type: application/json" \
      --request GET \
-     http://localhost:5000/v2/users/107/matches
+     http://localhost:5000/v2/users/101/matches
 
 Response:
 {
