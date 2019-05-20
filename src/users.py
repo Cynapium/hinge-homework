@@ -1,5 +1,5 @@
 from flask_restful import Api, Resource, reqparse
-import database
+from db import database
 from http import HTTPStatus
 from response import *
 import model_v1
