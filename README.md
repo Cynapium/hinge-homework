@@ -45,9 +45,6 @@ Stores the rating between users.
 - type          STRING                  Type of rating          L/B/R
 - time          STRING                  Date/time of the rating
 
-Additionally, user and user_target are linked to the field id of the user
-table. A record cannot be inserted if they do not exist in that user table.
-
 The types of ratings are:
 - L:    Likes
 - B:    Blocks
